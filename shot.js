@@ -90,42 +90,59 @@ async function loginIfNeeded(page) {
         await page.goto(TARGET_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
         await sleep(1500);
 
+
+        // 👇 Paste these debug logs here
+        console.log("URL:", page.url());
+        console.log("Title:", await page.title());
+        console.log("User agent set.");
+        const countUls = await page.$$eval("ul", (uls) => uls.length);
+        console.log("UL count on page:", countUls);
+
+
         // gentle scroll to trigger lazy loading
         await page.mouse.wheel({ deltaY: 1200 });
         await sleep(800);
 
         // Step 3 — find all candidate <ul> and pick the one with the most direct <li> children
-        const UL_EXACT = 'ul.display-flex.flex-wrap.list-style-none.justify-center';
-        await page.waitForSelector(UL_EXACT, { timeout: 30000 });
+        // Preferred selector (when classes match)
+        let ul = await page.$('ul.display-flex.flex-wrap.list-style-none.justify-center');
 
-        const uls = await page.$$(UL_EXACT);
-        if (!uls.length) throw new Error("No matching <ul> found.");
-
-        let ul = null;
-        let bestCount = -1;
-
-        for (const candidate of uls) {
-            const count = await candidate.evaluate(el => el.querySelectorAll(':scope > li').length);
-            if (count > bestCount) {
-                bestCount = count;
-                ul = candidate;
-            }
+        // Fallback: pick the <ul> that has the MOST direct <li> children
+        if (!ul) {
+            const handle = await page.evaluateHandle(() => {
+                const all = Array.from(document.querySelectorAll("ul"));
+                all.sort((a, b) =>
+                    (b.querySelectorAll(":scope > li").length) - (a.querySelectorAll(":scope > li").length)
+                );
+                return all[0] || null;
+            });
+            const asElement = handle.asElement?.();
+            if (asElement) ul = asElement;
         }
 
-        if (!ul) throw new Error("Could not choose a target <ul>.");
+        if (!ul) throw new Error("Could not find a UL. Check debug/landing.html & debug/uls.json.");
 
-        // Now only take the direct <li> children of that UL
-        const liHandles = await ul.$$(':scope > li');
-        if (!liHandles.length) throw new Error("No direct <li> children found under the target <ul>.");
+        // Only direct <li> children of THAT ul
+        let liHandles = await ul.$$(":scope > li");
 
-        // keep the rest the same
-        const top3 = liHandles.slice(0, process.env.NUM_POSTS);
+        // (Optional) if still too few, do a light scroll loop to trigger lazy loading
+        let attempts = 0;
+        while (liHandles.length < (Number(process.env.numPosts) || 3) && attempts < 4) {
+            await page.mouse.wheel({ deltaY: 1400 });
+            await sleep(700);
+            liHandles = await ul.$$(":scope > li");
+            attempts++;
+        }
+
+        if (!liHandles.length) throw new Error("No direct <li> children under the chosen UL.");
+        const topN = liHandles.slice(0, Number(process.env.numPosts) || 3);
+        // const top3 = liHandles.slice(0, process.env.NUM_POSTS);
 
 
         const base = sanitize(TARGET_URL.replace(/^https?:\/\//, ""));
         let idx = 1;
 
-        for (const li of top3) {
+        for (const li of topN) {
             // Ensure in view
             await li.evaluate((el) => el.scrollIntoView({ block: "center" }));
             // await page.waitForTimeout(600);
