@@ -14,7 +14,6 @@ coverage/
 .cache/
 
 # ── Puppeteer artifacts & app outputs
-         # screenshots from this tool (binary, large)
 user_data/          # browser profile if you ever enable it
 # screenshots*/     # uncomment if you create other screenshot dirs
 
