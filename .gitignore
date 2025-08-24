@@ -1,0 +1,34 @@
+# ── Node / package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json#mlock           # keep lockfile tracked (remove this line if you want to ignore)
+# If you DO want to track the lockfile, delete the line above.
+
+# ── Build / coverage / caches
+dist/
+build/
+coverage/
+.cache/
+
+# ── Puppeteer artifacts & app outputs
+screens/            # screenshots from this tool (binary, large)
+user_data/          # browser profile if you ever enable it
+# screenshots*/     # uncomment if you create other screenshot dirs
+
+# ── Env & secrets
+.env
+.env.*
+!.env.example       # keep a template committed
+
+# ── OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.history/
+
+# ── Misc
+*.log
