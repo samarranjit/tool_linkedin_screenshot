@@ -119,7 +119,7 @@ async function loginIfNeeded(page) {
         if (!liHandles.length) throw new Error("No direct <li> children found under the target <ul>.");
 
         // keep the rest the same
-        const top3 = liHandles.slice(0, process.env.numPosts);
+        const top3 = liHandles.slice(0, process.env.NUM_POSTS);
 
 
         const base = sanitize(TARGET_URL.replace(/^https?:\/\//, ""));
