@@ -10,6 +10,11 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    env:
+      LINKEDIN_USER: ${{ secrets.LINKEDIN_USER }}
+      LINKEDIN_PASS: ${{ secrets.LINKEDIN_PASS }}
+      TARGET_USER: ${{ secrets.TARGET_USER }}
+      numPosts: ${{ secrets.numPosts }}
 
     steps:
       - uses: actions/checkout@v3
@@ -18,16 +23,17 @@ jobs:
         with:
           node-version: 18.x
           cache: "npm"
-          cache-dependency-path: parser/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - run: git pull
 
       # Only run `npm ci` if lockfile or package.json changed
-      - run: npm ci --prefix
+      - run: npm ci
 
       - run: node shot.js
 
       - run: |
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f 'screens/*'
