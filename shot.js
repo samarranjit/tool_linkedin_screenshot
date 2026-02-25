@@ -135,7 +135,7 @@ async function loginIfNeeded(page) {
         }
 
         if (!liHandles.length) throw new Error("No direct <li> children under the chosen UL.");
-        const topN = liHandles.slice(0, Number(process.env.numPosts) || 3);
+        const topN = liHandles.slice(0, Number(process.env.NUM_POSTS) || 3);
         // const top3 = liHandles.slice(0, process.env.NUM_POSTS);
 
 
