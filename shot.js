@@ -146,7 +146,7 @@ async function loginIfNeeded(page) {
             // Ensure in view
             await li.evaluate((el) => el.scrollIntoView({ block: "center" }));
             // await page.waitForTimeout(600);
-            await sleep(600);
+            await sleep(1000);
 
 
 

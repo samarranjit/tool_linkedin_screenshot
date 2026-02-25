@@ -1,7 +1,7 @@
 name: "Update Linkedin Screenshots List"
 on:
-  schedule:
-    - cron: "0 0 */4 * *"
+  # schedule:
+  #   - cron: "0 0 */2 * *"
   workflow_dispatch:
 
 jobs:
