@@ -19,6 +19,10 @@ if [ -f .env ]; then
   set +a
 fi
 
+# Sync with remote before doing any work
+git fetch origin
+git rebase origin/$BRANCH
+
 # Run screenshot bot
 node shot.js
 
@@ -35,4 +39,9 @@ if git diff --cached --quiet; then
 fi
 
 git commit -m "Update LinkedIn screenshots ($(date -Iseconds))"
+
+# Sync again before pushing, in case remote changed while script was running
+git fetch origin
+git rebase origin/$BRANCH
+
 git push origin "$BRANCH"
