@@ -40,14 +40,25 @@ async function loginIfNeeded(page) {
     // Go to /login directly (fewer redirects)
     await page.goto("https://www.linkedin.com/login", { waitUntil: "domcontentloaded", timeout: 120000 });
 
-    // If already logged in, /login may redirect to /feed and #username won’t exist.
-    const needsLogin = await page.$("#username");
+    // LinkedIn's new login form uses dynamic ids, so match by input type.
+    // If already logged in, /login redirects away and no email input exists.
+    const emailSel = 'input[type="email"], #username';
+    const passSel = 'input[type="password"], #password';
+    const needsLogin = await page.$(emailSel);
     if (!needsLogin) return;
 
-    await page.type("#username", USER, { delay: 20 });
-    await page.type("#password", PASS, { delay: 20 });
+    // The form renders duplicate inputs; use the visible ones.
+    const visible = async (sel) => {
+        for (const h of await page.$$(sel)) if (await h.boundingBox()) return h;
+    };
+    const emailEl = await visible(emailSel);
+    const passEl = await visible(passSel);
+    await emailEl.click();
+    await emailEl.type(USER, { delay: 20 });
+    await passEl.click();
+    await passEl.type(PASS, { delay: 20 });
     await Promise.all([
-        page.click('button[type="submit"]'),
+        page.keyboard.press("Enter"),
         page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 120000 }),
     ]);
 

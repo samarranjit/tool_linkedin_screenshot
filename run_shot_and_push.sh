@@ -24,7 +24,11 @@ git fetch origin
 git rebase origin/$BRANCH
 
 # Run screenshot bot
-node shot.js
+if [ -z "${DISPLAY:-}" ]; then
+  xvfb-run -a --server-args="-screen 0 1366x2200x24" node shot.js
+else
+  node shot.js
+fi
 
 # Ensure git identity exists (local to this repo)
 git config user.name "ChoLab Screenshot Bot"
