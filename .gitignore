@@ -14,13 +14,15 @@ coverage/
 .cache/
 
 # ── Puppeteer artifacts & app outputs
-user_data/          # browser profile if you ever enable it
+# browser profile if you ever enable it
+user_data/
 # screenshots*/     # uncomment if you create other screenshot dirs
 
 # ── Env & secrets
 .env
 .env.*
-!.env.example       # keep a template committed
+# keep a template committed
+!.env.example
 
 # ── OS / editors
 .DS_Store
