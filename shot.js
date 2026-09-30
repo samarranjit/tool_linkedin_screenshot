@@ -71,7 +71,7 @@ async function loginIfNeeded(page) {
     const USER_DATA = path.join(__dirname, "user_data");
 
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         defaultViewport: { width: 1366, height: 2200, deviceScaleFactor: 2 },
         args: [
             "--no-sandbox",
